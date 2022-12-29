@@ -1,0 +1,28 @@
+﻿<Border x:Class="StickyNotes.Pages.Dialogs.LoginPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:viewmodels="clr-namespace:StickyNotes.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:LoginDialogViewModel}"
+        mc:Ignorable="d" 
+        CornerRadius="5"
+        Width="460.500"
+        Height="283.766"
+        Background="#FFF0F0F0" BorderBrush="#FFE0E0E0" BorderThickness="0.9">
+
+    <hc:TransitioningContentControl TransitionMode="Fade">
+        <hc:SimplePanel>
+            <TextBlock HorizontalAlignment="Stretch" TextAlignment="Center" FontSize="18" Text="{Binding Title}" Margin="173.5,20,173.5,0" VerticalAlignment="Top" Height="25"/>
+            
+            <TextBox x:Name="code" HorizontalAlignment="Stretch" Style="{StaticResource TextBoxExtend}" hc:InfoElement.TitlePlacement="Left" hc:InfoElement.Title="{Binding Hint0}" Height="12" TextWrapping="Wrap" VerticalAlignment="Top" Margin="85,70,85.5,0"/>
+            <TextBox x:Name="user" HorizontalAlignment="Stretch" Style="{StaticResource TextBoxExtend}" hc:InfoElement.TitlePlacement="Left" hc:InfoElement.Title="{Binding Hint1}" Height="12" TextWrapping="Wrap" VerticalAlignment="Top" Margin="85,105,85.5,0"/>
+            <PasswordBox x:Name="pass" HorizontalAlignment="Stretch" Style="{DynamicResource PasswordBoxExtend}" PasswordChar="*" 
+             hc:TitleElement.Title="{Binding Hint2}"
+             hc:TitleElement.TitlePlacement="Left" Height="12" hc:PasswordBoxAttach.IsMonitoring="True" VerticalAlignment="Top" Margin="85,140,85,0"/>
+
+            <Button Name="close" HorizontalAlignment="Right" VerticalAlignment="Top" Background="#99D40000" Margin="0,10,10,0" hc:BorderElement.CornerRadius="9" Height="20" Width="20"/>
+            <Button HorizontalAlignment="Stretch" hc:BorderElement.CornerRadius="6" x:Name="apply" Content="{Binding ButtonText}" Height="38" VerticalAlignment="Bottom" Margin="85,0,85,30" Click="apply_Click" Background="#990065D4" Foreground="#FFFAFAFA"/>
+            <TextBlock x:Name="info" HorizontalAlignment="Stretch" TextAlignment="Center" FontSize="10" Text="{Binding ActionBarText}" Margin="173.5,195,173.5,0" VerticalAlignment="Top" Height="17"/>
+        </hc:SimplePanel>
+    </hc:TransitioningContentControl>
+</Border>

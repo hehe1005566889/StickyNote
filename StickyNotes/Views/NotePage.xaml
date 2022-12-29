@@ -1,0 +1,39 @@
+﻿<Window x:Class="StickyNotes.Views.NotePage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:StickyNotes.Views"
+        mc:Ignorable="d"
+        Title="NotePage" Height="{Binding Height}" Width="{Binding Width}" Top="{Binding Top}" Left="{Binding Left}"
+        xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:viewmodels="clr-namespace:StickyNotes.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:NoteWindowViewModel}"
+        hc:WindowAttach.IgnoreAltF4="True"
+        hc:WindowAttach.ShowInTaskManager="False"
+        ShowInTaskbar="False"
+        WindowStyle="None" Background="#4C000000" MinWidth="80" MinHeight="80" AllowsTransparency="True"
+        >
+
+    <Border BorderBrush="#B2000000" BorderThickness="1">
+        <hc:SimplePanel>
+            <hc:SimplePanel Name="TitleBar" Height="23" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="#CCFFFFFF">
+                <Button 
+                FontSize="12"
+                WindowChrome.IsHitTestVisibleInChrome="True" 
+                x:Name="chrome_menu"
+                VerticalAlignment="Stretch" 
+                HorizontalAlignment="Left" 
+                Width="20" 
+                Content="&#xe712;" 
+                Padding="0"
+                FontFamily="Segoe MDL2 Assets" 
+                VerticalContentAlignment="Center"
+                Background="#4CFFFFFF" 
+                BorderBrush="{x:Null}" Foreground="#99000000" FontWeight="Bold" Height="Auto" Click="Chrome_menu_Click"
+                />
+                <TextBlock x:Name="TitleText" Text="{Binding Title}" Margin="25,4,15,4" VerticalAlignment="Center" TextAlignment="Left" Foreground="#99000000"/>
+            </hc:SimplePanel>
+            <TextBox AcceptsReturn="True" SelectionBrush="Gray" VerticalScrollBarVisibility="Auto" AllowDrop="True" Text="{Binding InputText}" Name="Input" TextAlignment="Left" VerticalContentAlignment="Top" Margin="3,25,3,3" Foreground="White" CaretBrush="White" BorderBrush="{x:Null}" Background="{x:Null}" OverridesDefaultStyle="True" SpellCheck.IsEnabled="True" AutomationProperties.IsColumnHeader="True" ForceCursor="True" IsManipulationEnabled="True" IsInactiveSelectionHighlightEnabled="True" />
+
+        </hc:SimplePanel>
+    </Border>
+</Window>
