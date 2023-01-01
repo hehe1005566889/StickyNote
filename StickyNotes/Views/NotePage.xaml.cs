@@ -2,6 +2,7 @@
 using StickyNotes.Controllers;
 using StickyNotes.Utils;
 using StickyNotes.Utils.Common;
+using StickyNotes.Utils.Configration;
 using StickyNotes.ViewModels;
 using System;
 using System.Runtime.InteropServices;
@@ -67,7 +68,6 @@ namespace StickyNotes.Views
 
         }
         
-
         protected override void OnClosed(EventArgs e)
         {
             if (Controller is null)
@@ -98,14 +98,24 @@ namespace StickyNotes.Views
         
         protected override void OnActivated(EventArgs e)
         {
+            if (!Setting.EnableEffect)
+                return;
+            else if (IsEnableEffect)
+                return;
             NativeEffectSupport.EnableBlur(this);
+            IsEnableEffect = true;
             base.OnActivated(e);
             GC.Collect();
         }
 
         protected override void OnDeactivated(EventArgs e)
         {
+            if (Setting.EnableEffect)
+                return;
+            else if (!IsEnableEffect)
+                return;
             NativeEffectSupport.DisableBlur(this);
+            IsEnableEffect = false;
             base.OnDeactivated(e);
             GC.Collect();
             GC.WaitForFullGCComplete();
@@ -121,6 +131,7 @@ namespace StickyNotes.Views
 
         ~NotePage()
         {
+            NativeEffectSupport.DisableBlur(this);
             GC.SuppressFinalize(Input);
             GC.SuppressFinalize(Info);
             GC.SuppressFinalize(Menu);
@@ -134,6 +145,7 @@ namespace StickyNotes.Views
         private NotePageCloseMenuBuilder Menu { get; set; }
         public NotePageController Controller { get; }
         public NoteWindowViewModel Model { get; } = new NoteWindowViewModel();
-        
+        private readonly AppSetting Setting = App.Instance.Config;
+        private bool IsEnableEffect = false;
     }
 }

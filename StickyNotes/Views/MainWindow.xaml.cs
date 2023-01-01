@@ -2,6 +2,7 @@
 using StickyNotes.Common;
 using StickyNotes.Pages;
 using StickyNotes.Utils;
+using StickyNotes.Utils.Configration;
 using StickyNotes.Utils.UI;
 using StickyNotes.ViewModels;
 using System;
@@ -89,14 +90,24 @@ namespace StickyNotes.Views
 
         protected override void OnActivated(EventArgs e)
         {
+            if (!Setting.EnableEffect)
+                return;
+            else if (IsEnableEffect)
+                return;
             NativeEffectSupport.EnableBlur(this);
+            IsEnableEffect = true;
             base.OnActivated(e);
             GC.Collect();
         }
 
         protected override void OnDeactivated(EventArgs e)
         {
+            if (Setting.EnableEffect)
+                return;
+            else if (!IsEnableEffect)
+                return;
             NativeEffectSupport.DisableBlur(this);
+            IsEnableEffect = false;
             base.OnDeactivated(e);
             GC.Collect();
             GC.WaitForFullGCComplete();
@@ -109,6 +120,17 @@ namespace StickyNotes.Views
             base.OnClosing(e);
         }
 
+        ~MainWindow()
+        {
+            NativeEffectSupport.DisableBlur(this);
+            GC.SuppressFinalize(Tor);
+            GC.SuppressFinalize(ViewModel);
+            GC.Collect();
+            GC.WaitForFullGCComplete();
+        }
+
+        private bool IsEnableEffect = false;
+        private readonly AppSetting Setting = App.Instance.Config;
         private readonly Navigator Tor;
         private readonly MainWindowViewModel ViewModel = new MainWindowViewModel();
     }

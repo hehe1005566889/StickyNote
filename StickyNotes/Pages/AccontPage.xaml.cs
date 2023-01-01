@@ -6,6 +6,7 @@ using StickyNotes.Net.Packets.ServerBound;
 using StickyNotes.Pages.Dialogs;
 using StickyNotes.Utils;
 using StickyNotes.Utils.UI;
+using StickyNotes.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,11 +16,12 @@ using System.Xml;
 
 namespace StickyNotes.Pages
 {
-    [AppPage(0, "便签页", "\ue80f", typeof(AccontPage))]
+    [AppPage(0, "SyncPage", "\ue80f", typeof(AccontPage))]
     public sealed partial class AccontPage : SimplePanel
     {
         public AccontPage()
         {
+            DataContext = Model;
             InitializeComponent();
 
             connect.Visibility = App.Net is null ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
@@ -41,10 +43,7 @@ namespace StickyNotes.Pages
         }
 
         private void Account_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            accont.IsOpen = true;
-            GC.Collect();
-        }
+            => Model.OpenMenu();
 
         private void Display2_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -113,7 +112,8 @@ namespace StickyNotes.Pages
             GC.Collect();
         }
 
-        private Dialog Dialogs; 
+        private Dialog Dialogs;
+        private readonly AcccountPageViewModel Model = new AcccountPageViewModel();
         private NotesWindows WindowController { get; } = NotesWindows.GetController();
     }
 }

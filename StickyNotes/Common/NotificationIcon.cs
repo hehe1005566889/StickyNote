@@ -1,6 +1,7 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
 using HTBInject.Utils;
+using StickyNotes.Utils.Common;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -28,14 +29,15 @@ namespace StickyNotes.Common
             Icon.Visibility = Visibility.Visible;
             Icon.ContextMenu = Menu;
 
+            App.Instance.Trans.ApplyTranslation(typeof(NotificationIcon), this);
             LoadMenus();
             BuildUpMenu();
         }
 
         private void LoadMenus()
         {
-            MenuItems.Add(new MenuInfo(){ Icon = "\ue8bb", Name = "退出" }, new Action(() => App.Instance.ExitApp()));
-            MenuItems.Add(new MenuInfo(){ Icon = "\ue897", Name = "关于" }, new Action(() => 
+            MenuItems.Add(new MenuInfo(){ Icon = "\ue8bb", Name = Exit }, new Action(() => App.Instance.ExitApp()));
+            MenuItems.Add(new MenuInfo(){ Icon = "\ue897", Name = About }, new Action(() => 
                 SendMessage("About", AssetsManger.GetAssets(AssetsManger.Type.type_string, "About") as string, MessageType.Info)
             ));
         }
@@ -94,6 +96,11 @@ namespace StickyNotes.Common
             GC.SuppressFinalize(Icon);
             GC.Collect();
         }
+
+        [Translable]
+        public string Exit;
+        [Translable]
+        public string About;
 
         public static readonly NotificationIcon Instance = new NotificationIcon();
         public readonly NotifyIcon Icon;

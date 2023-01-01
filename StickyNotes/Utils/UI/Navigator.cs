@@ -1,5 +1,6 @@
 ﻿using HandyControl.Controls;
 using HTBInject.Utils;
+using StickyNotes.Utils.Configration;
 using System;
 using System.Reflection;
 using System.Windows;
@@ -86,7 +87,7 @@ namespace StickyNotes.Utils.UI
                 return;
             SimplePanel instance = (SimplePanel)Activator.CreateInstance(page.Page);
 
-            if (IsAnimationEnable)
+            if (Setting.EnableAnimation)
                 frame.Child = PageUtils.AnimatedPage(instance, Style);
             else
                 frame.Child = instance;
@@ -106,8 +107,8 @@ namespace StickyNotes.Utils.UI
 
         public AnimationStyle Style { private get; set; } = AnimationStyle.D;
         private readonly NaviPages PageCollect = NaviPages.Pages;
+        private readonly AppSetting Setting = App.Instance.Config;
         private readonly Border frame;
         private int NaviTime = 0;
-        public bool IsAnimationEnable { get; set; } = true;
     }
 }

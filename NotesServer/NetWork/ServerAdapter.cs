@@ -1,6 +1,8 @@
 ﻿using FlyBirdCommon.Logger;
 using StickyNoteCommon.Framework;
 using StickyNoteCommon.Net;
+using StickyNoteCommon.Net.API;
+using StickyNoteCommon.Net.Basic;
 using StickyNotes.Protocol;
 using StickyNotes.Protocol.Tools;
 using System;
@@ -14,24 +16,13 @@ using System.Threading.Tasks;
 namespace NotesServer.NetWork
 {
     [AppService("serveradapter", Mode = ServiceStartUpMode.Auto)]
-    class ServerAdapter
+    sealed class ServerAdapter : IServer 
     {
-        public readonly PacketMapping Mapping = new PacketMapping(Assembly.GetExecutingAssembly());
-        private readonly List<ClientModel> Clients = new List<ClientModel>();
-        private readonly TcpListener Listener;
-        private readonly Logger logger = SharedLoggers.GetNetLogger();
-        private bool IsCallToDead = false;
-
         public ServerAdapter()
         {
-            logger.Info("Server Start At Port {0}", 9090.ToString());
-            Listener = new TcpListener(IPAddress.Any, 9090);
-            var publicIP = "127.0.0.1";
-            logger.Success("Connect Code {0}", BuildConnectCode(publicIP, 9090));
-
-            Mapping.RegisterPackets();
-            Listener.Start();
-            _ = Task.Run(OnListen);
+            ServerNetWork = new ServerUtil(Assembly.GetExecutingAssembly(), ProtocolMode.TCP, this, 9090);
+            logger.Success("Connect Code {0}", BuildConnectCode("127.0.0.1", 9090));
+            ServerNetWork.Start();
             GC.Collect();
         }
 
@@ -46,48 +37,32 @@ namespace NotesServer.NetWork
                 return Convert.ToBase64String(Gzip.CompressBytes(Encoding.UTF8.GetBytes(orign)));
             }
         }
-        
-        private async Task OnListen()
-        {
-            Socket accept = null;
-            try
-            {
-                accept = await Listener.AcceptSocketAsync();
-                logger.Info("Server Stop To Listening The New Connection At Now :)");
-                Clients.Add(new ClientModel(accept, this));
-                GC.Collect();
-            }
-            catch (Exception e)
-            {
-                logger.Error("Error When Listen Connect {0}", e.ToString());
-            }
 
-            if (IsCallToDead)
-                KillClientModel();
-            else
-                _ = Task.Run(OnListen);
-        }
-
-        private void KillClientModel()
+        public void PreConnect(ref IPacketManager manger)
         {
-            //TODO Kill NMB
+            manger = new ClientModel();
+            Collect.Add(manger);
             GC.Collect();
         }
 
-        public void UnRegisterClient(ClientModel model)
+        public void OnStop() => GC.Collect();
+    
+        public void OnActive()
         {
-            Clients.Remove(model);
-            GC.SuppressFinalize(model);
+            var info = ServerNetWork.GetInfo();
+            logger.Success("Server Started Listening At Port {0}", info.Port);
+            GC.SuppressFinalize(info);
             GC.Collect();
         }
 
-        public void Dispose()
+        public void OnDead()
         {
-            IsCallToDead = true;
-            Listener.Stop();
-            GC.SuppressFinalize(Listener);
-            GC.SuppressFinalize(this);
+            logger.Warn("Server Stop Listening, Client Will Not Able To Connect");
             GC.Collect();
         }
+
+        private readonly ServerUtil ServerNetWork;
+        private readonly Logger logger = SharedLoggers.GetNetLogger();
+        private readonly PacketManagerList Collect = new PacketManagerList();
     }
 }

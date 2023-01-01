@@ -28,8 +28,14 @@ namespace StickyNotes.Utils.Common
                     File.WriteAllBytes($"{filePth}//ExceptionReport_{DateTime.Now.ToFileTime()}.report", package.EncodePacket(114514));
             }
         }
-
+        
         public static bool DisplayExceptionMsg(Exception e)
+        {
+            new ExceptionUI(e).Show();
+            return true;
+        }
+
+        public static string BuildExceptionMsg(Exception e)
         {
             StringBuilder report = new StringBuilder();
             report.Append("Porgram Error!\n")
@@ -40,12 +46,7 @@ namespace StickyNotes.Utils.Common
                   .Append($"Stack {e.StackTrace}\n")
                   .Append($"Time {DateTime.Now.ToFileTime()}\n\n")
                   .Append("Click Yes To ReOpen Or Continue Run The Porgram!\n\n");
-            var res = MessageBox.Show(report.ToString(), "Exception", MessageBoxButton.YesNo, MessageBoxImage.Stop);
-            if (res == MessageBoxResult.No)
-                Environment.Exit(-1);
-            else
-                return true;
-            return false;
+            return report.ToString();
         }
     }
 }

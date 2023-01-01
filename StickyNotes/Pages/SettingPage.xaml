@@ -15,8 +15,8 @@
         <ListBox.ItemTemplate>
             <DataTemplate DataType="{x:Type viewmodels:SettingItem}">
                 <hc:SimplePanel HorizontalAlignment="Stretch">
-                    <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsToggle}" VerticalAlignment="Center" Style="{StaticResource ToggleButtonSwitch}" Width="44" Margin="0,0,10,0"/>
-                    <TextBlock Text="{Binding Title}" FontSize="14" TextAlignment="Left" FontFamily="Microsoft YaHei UI" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="#FF656565"/>
+                    <ToggleButton ToolTip="{Binding Title}" Foreground="{x:Null}" Unchecked="ToggleButton_Unchecked" Checked="ToggleButton_Checked" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Right" IsChecked="{Binding IsChecked}" VerticalAlignment="Stretch" Width="60" Margin="0,0,10,0" Background="#02FFFFFF"/>
+                    <TextBlock Text="{Binding TransTitle}" FontSize="14" TextAlignment="Left" FontFamily="Microsoft YaHei UI" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="#FF656565"/>
                 </hc:SimplePanel>
             </DataTemplate>
         </ListBox.ItemTemplate>

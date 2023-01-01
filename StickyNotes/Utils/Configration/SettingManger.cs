@@ -12,7 +12,7 @@ namespace HTBInject.Utils
 {
     class SettingManger
     {
-        private static string basepath = AssetsManger.GetFolderPath() + "\\Assets\\Configs\\";
+        private static readonly string basepath = AssetsManger.GetFolderPath() + "\\Assets\\Configs\\";
         private static SettingUI sui;
 
         public static void Init()
@@ -23,7 +23,7 @@ namespace HTBInject.Utils
 
         }
 
-        public static void ApplyUI(ListView lv) => sui.appleDisplay(lv);
+        public static void ApplyUI(ListView lv) => sui.AppleDisplay(lv);
     }
 
     class SettingUI
@@ -33,25 +33,27 @@ namespace HTBInject.Utils
 
         class SystemSetting
         {
-            public TextBlock tb { get; set; }
-            public object control { get; set; }
+            public TextBlock Tb { get; set; }
+            public object Control { get; set; }
 
             public SystemSetting(TextBlock Tb, object Ct)
             {
-                tb = Tb; control = Ct;
+                this.Tb = Tb; Control = Ct;
+                GC.Collect();
             }
         }
 
-        private JArray bindings;
-        private JObject settings;
+        private readonly JArray bindings;
+        private readonly JObject settings;
 
         public SettingUI(JObject setting,JArray binding) 
         {
             settings = setting;bindings = binding;
-            build();
+            Build();
+            GC.Collect();
         }
 
-        private void build()
+        private void Build()
         {
             foreach(JObject obj in bindings)
             {
@@ -82,6 +84,11 @@ namespace HTBInject.Utils
             GC.Collect();
         }
 
-        public void appleDisplay(ListView lv) => lv.Dispatcher.Invoke(() => { lv.ItemsSource = stm; });
+        public void AppleDisplay(ListView lv) 
+            => lv.Dispatcher.Invoke(() => {
+                lv.ItemsSource = stm;
+            });
+
+        ~SettingUI() => GC.Collect();
     }
 }

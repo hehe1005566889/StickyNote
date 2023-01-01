@@ -1,70 +1,56 @@
 ﻿using FlyBirdCommon.Logger;
 using StickyNoteCommon.Net;
+using StickyNoteCommon.Net.API;
+using StickyNoteCommon.Net.Basic;
 using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace NotesServer.NetWork
 {
-    class ClientModel
+    class ClientModel : IPacketManager
     {
-        private readonly Socket clientSocket;
-        private readonly ServerAdapter adapeter;
-        private readonly NetworkStream nStream;
+
+        public void OnActive() => GC.Collect();
+
+        public void OnAddCollect(PacketManagerList collect, int id)
+        {
+            clientID = id;
+            GC.Collect();
+        }
+
+        public void OnClose()
+        {
+            logger.Info("Client Closed Connect");
+            GC.Collect();
+        }
+
+        public void OnCollectCallKill(PacketManagerList collect)
+        {
+            logger.Info("Call Kill Event By Server Adapter");
+            manager.KillManager();
+        }
+
+        public void OnInit(PacketManager manager)
+        {
+            var info = manager.GetInfo();
+            logger.Info("New Client Connect Form {0}(Port {1}, Local Port {2})", info.IP, info.Port, info.LocalPort);
+            this.manager = manager;
+        }
+
+        public void OnRecievePacket(IPacket packet, Packet info)
+        {
+
+        }
+
+        public void OnSendPacket(IPacket packet, Packet info)
+        {
+
+        }
+
+        private int clientID;
+        private PacketManager manager;
         private readonly Logger logger = SharedLoggers.GetNetLogger();
-        private readonly bool IsDebugMode = true;
-        private bool IsCallToDead = false;
-
-        public ClientModel(Socket clientSocket, ServerAdapter adapter)
-        {
-            this.clientSocket = clientSocket;
-            adapeter = adapter;
-            nStream = new NetworkStream(clientSocket);
-
-            GC.Collect();
-        }
-
-        public PacketReadBack ReadPacketFromStream()
-        {
-            using (PacketReader reader = new PacketReader(nStream))
-            {
-                var packet = reader.ReadPacket(adapeter.Mapping);
-                var info = reader.GetPacketInfo(packet);
-                return new PacketReadBack(packet, info);
-            }
-        }
-
-        private Task ReadPacketTask()
-        {
-            try
-            {
-                PacketReadBack back = ReadPacketFromStream();
-                
-            }catch(Exception e)
-            {
-                logger.Warn("Error When Reading Packet, {0}", IsDebugMode ? e.ToString() : "You Can Report It To Us");
-                GC.Collect();
-            }
-
-            if (IsCallToDead)
-                KillClient();
-            else
-                return Task.Run(ReadPacketTask);
-            return Task.CompletedTask;
-        }
-
-        private void KillClient()
-        {
-            clientSocket.Disconnect(true);
-            clientSocket.Close();
-            clientSocket.Dispose();
-            adapeter.UnRegisterClient(this);
-            GC.Collect();
-            GC.WaitForFullGCComplete();
-        }
-
-        public void KillThis() => IsCallToDead = true;
-        ~ClientModel() => KillThis();
     }
 
     struct PacketReadBack

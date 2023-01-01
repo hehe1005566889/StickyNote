@@ -1,5 +1,6 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Tools.Command;
+using StickyNotes.Utils.Common;
 using StickyNotes.Utils.UI;
 using System;
 using System.Collections.Generic;
@@ -25,15 +26,6 @@ namespace StickyNotes.ViewModels
             }
             get => content;
         }
-
-        public string Icon0 => "\ue80f";
-        public string Tips0 => "同步";
-
-        public string Icon1 => "\ue71d";
-        public string Tips1 => "便签管理";
-        
-        public string Icon2 => "\ue713";
-        public string Tips2 => "程序设置";
     }
 
     public class Item

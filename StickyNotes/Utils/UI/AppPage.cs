@@ -10,7 +10,7 @@ namespace StickyNotes.Utils.UI
 
         public AppPage(int id, string name, string icon, Type page)
         {
-            Info = new PageInfo(name, icon);
+            Info = new PageInfo(App.Instance.Trans.GetValue(name), icon);
             Page = page;
             Id = id;
         }

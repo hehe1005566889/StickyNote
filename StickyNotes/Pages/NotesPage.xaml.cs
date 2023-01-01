@@ -5,6 +5,7 @@ using StickyNotes.Controllers;
 using StickyNotes.Net.Packets.ClientBound;
 using StickyNotes.Protocol;
 using StickyNotes.Utils;
+using StickyNotes.Utils.Common;
 using StickyNotes.Utils.UI;
 using StickyNotes.ViewModels;
 using System;
@@ -13,28 +14,14 @@ using System.IO;
 
 namespace StickyNotes.Pages
 {
-    [AppPage(1, "便签管理", "\ue71d", typeof(NotesPage))]
+    [AppPage(1, "ManagerPage", "\ue71d", typeof(NotesPage))]
     public sealed partial class NotesPage : SimplePanel, IInputBoxController
     {
-        public NotesPage()
-        {
-            DataContext = Model;
-            Controller = new NotesPageController(this);
-            Controller.ScanNotes();
-
-            InitializeComponent();
-
-            if (Tickets.Items.Count != 0)
-                Tickets.SelectedIndex = 0;
-            Tickets.MouseDoubleClick += Tickets_MouseDoubleClick;
-            Add.Click += Add_Click;
-            @public.Click += Public_Click;
-            
-            NativeImport.CollectRam();
-        }
 
         private void Public_Click(object sender, System.Windows.RoutedEventArgs e)
         {
+            if (Tickets.SelectedIndex is -1)
+                return;
             var ticket = ReadTicket(Tickets.SelectedItem.ToString());
             App.Net.SendPacket(new ClientBoundPublicNotePacket()
             {
@@ -90,7 +77,7 @@ namespace StickyNotes.Pages
         {
             if (Type is NotesPageActionType.OnAdding)
             {
-                Growl.InfoGlobal($"创建便签名字为 {content} :>");
+                Growl.InfoGlobal($"{TickName} {content} :>");
                 Controller.CreateNewNote(content);
                 Controller.ScanNotes();
             }
@@ -104,6 +91,30 @@ namespace StickyNotes.Pages
             GC.SuppressFinalize(Model);
             GC.Collect();
         }
+
+        public NotesPage()
+        {
+            DataContext = Model;
+            Controller = new NotesPageController(this);
+            Controller.ScanNotes();
+
+            InitializeComponent();
+
+            if (Tickets.Items.Count != 0)
+                Tickets.SelectedIndex = 0;
+            Tickets.MouseDoubleClick += Tickets_MouseDoubleClick;
+            Add.Click += Add_Click;
+            @public.Click += Public_Click;
+            
+            App.Instance.Trans.ApplyTranslation(typeof(NotesPage), this);
+            NativeImport.CollectRam();
+        }
+
+        [Translable]
+        public string TickName;
+
+        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+            => Model.OpenMenu();
 
         private NotesPageActionType Type;
         private NotesPageController Controller { get; }

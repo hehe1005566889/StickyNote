@@ -4,6 +4,7 @@ using StickyNotes.Common;
 using StickyNotes.Net;
 using StickyNotes.Utils;
 using StickyNotes.Utils.Common;
+using StickyNotes.Utils.Configration;
 using StickyNotes.Views;
 using System;
 using System.IO;
@@ -16,25 +17,12 @@ namespace StickyNotes
 {
     public partial class App : Application
     {
-        public static ConfigCollect AppConfig { get; set; }
-        public static Client Net { get; set; }
-        public static App Instance;
-        private MainWindow Window { get; set; }
-
         public App()
         {
             Instance = this;
+            Trans = new Translation("chinese");
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-            using (ConfigReader reader = new ConfigReader())
-            {
-                var result = reader.ReadDocument($"{AssetsManger.GetFolderPath()}\\StickyNote");
-                if (result == null)
-                {
-                    AppConfig = new ConfigCollect();
-                    InitDefaultConfig(AppConfig);
-                }
-                GC.Collect();
-            }
+            Config = new AppSetting();
             NotificationIcon.Instance.LoadIcon();
 
             DispatcherTimer timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(15) };
@@ -46,7 +34,7 @@ namespace StickyNotes
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
             GC.Collect();
-            GC.WaitForFullGCComplete();
+            NativeImport.CollectRam();
         }
 
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
@@ -74,7 +62,10 @@ namespace StickyNotes
         {
             NotesWindows.GetController().LoadAllWindows();
 
-            NotificationIcon.Instance.RegisterMenuItem(new MenuInfo() { Icon = "\ue78b", Name = "显示窗体" }, new Action(() =>
+            NotificationIcon.Instance.RegisterMenuItem(new MenuInfo() {
+                Icon = "\ue78b",
+                Name = Trans.GetValue("ShowWindow")
+            }, new Action(() =>
             {
                 Dispatcher.Invoke(() => {
                     if (Window is null) Window = new MainWindow();
@@ -89,27 +80,10 @@ namespace StickyNotes
         public void ExitApp()
         {
             NotesWindows.GetController().SaveAllWindowNames();
-
             NotificationIcon.Instance.KillIcon();
+
             NativeImport.CollectRam();
             Environment.Exit(0);
-        }
-        
-        private void InitDefaultConfig(ConfigCollect config)
-        {
-            config.AddObject(new ConfigObject()
-            {
-                Nood = "EnableEffect", Type = "Bool", Value = "True"
-            });
-            config.AddObject(new ConfigObject()
-            {
-                Nood = "EnableNetWork", Type = "Bool", Value = "True"
-            });
-            config.AddObject(new ConfigObject()
-            {
-                Nood = "EnableAnimation", Type = "Bool", Value = "True"
-            });
-            GC.Collect();
         }
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
@@ -127,6 +101,20 @@ namespace StickyNotes
             }
         }
 
-        ~App() => ExitApp();
+        ~App()
+        {
+            Window.Close();
+            ExitApp();
+            GC.SuppressFinalize(Window);
+            GC.SuppressFinalize(Config);
+            GC.Collect();
+            GC.WaitForFullGCApproach();
+        }
+
+        public readonly AppSetting Config;
+        public readonly Translation Trans;
+        private MainWindow Window;
+        public static App Instance;
+        public static Client Net { get; set; }
     }
 }

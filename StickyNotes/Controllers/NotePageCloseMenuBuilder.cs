@@ -59,8 +59,9 @@ namespace StickyNotes.Views
 
         ~NotePageCloseMenuBuilder()
         {
-            menu.Items.Clear();
             GC.SuppressFinalize(menu);
+            GC.Collect();
+            GC.WaitForFullGCComplete();
         }
 
         private readonly ContextMenu menu = new ContextMenu();

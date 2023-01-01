@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StickyNotes.Utils.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,21 @@ namespace StickyNotes.ViewModels
 {
     public sealed class NotesPageViewModel : ViewModelBase
     {
-        public string Title => "便签管理";
+        public NotesPageViewModel()
+            => App.Instance.Trans.ApplyTranslation(typeof(NotesPageViewModel), this);
 
+        [Translable]
+        public string TitleStr;
+        public string Title => TitleStr;
+        public bool IsOpen { get; set; } = false;
         public List<string> FilesList { get; private set; } = new List<string>();
+
+        public void OpenMenu()
+        {
+            IsOpen = true;
+            OnPropertyChanged(nameof(IsOpen));
+            GC.Collect();
+        }
 
         public void UpdateTickets(List<string> items)
         {

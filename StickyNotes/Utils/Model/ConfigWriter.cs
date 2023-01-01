@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,10 +25,7 @@ namespace Name3.Models
             {
                 XDocument document = new XDocument();
                 collect.WriteTo(document);
-                XmlWriter writer = XmlWriter.Create($"{name}.config");
-                document.WriteTo(writer);
-                writer.Flush();
-                writer.Close();
+                File.WriteAllText($"{name}.config", document.ToString());
                 GC.Collect();
                 GC.SuppressFinalize(this);
                 return true;

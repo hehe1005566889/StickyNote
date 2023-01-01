@@ -22,8 +22,8 @@ namespace Name3.Models
                 var cfgCollect = new ConfigCollect();
                 if (!cfgCollect.ReadFrom(document))
                     throw new Exception("Error Read Config");
+                GC.SuppressFinalize(document);
                 GC.Collect();
-                GC.SuppressFinalize(this);
                 return cfgCollect;
             }
             catch (Exception e)
